@@ -4,6 +4,7 @@
 
 	What it will show is that the ffi can be included without
 	error.
+	
 --]]
 
 package.path = "../?.lua;"..package.path
