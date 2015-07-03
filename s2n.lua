@@ -55,6 +55,7 @@ function S2NConnection.blinding(self, value)
 	return true;
 end
 
+-- set the configuration for the connection
 function S2NConnection.config(self, value)
 end
 
@@ -67,6 +68,7 @@ function S2NConnection.delay(self)
 	return delay;
 end
 
+-- negotiate the handshake/connection
 function S2NConnection.negotiate(self)
 	local more = ffi.new("int[1]");
 	local err = s2n_api.s2n_negotiate(self.Handle, more);
@@ -78,6 +80,7 @@ function S2NConnection.negotiate(self)
 	return more[0] ~= 0;
 end
 
+-- get or set the server name
 function S2NConnection.serverName(self, value)
 	if not value then
 		-- get server name
@@ -110,7 +113,7 @@ function S2NConnection.send(self, buff, size)
 	return true;
 end
 
-
+-- shutdown the connection object
 function S2NConnection.shutdown(self)
 	local more = ffi.new("int[1]")
 	local err = s2n_api.s2n_shutdown(self.Handle, more);
@@ -122,6 +125,8 @@ function S2NConnection.shutdown(self)
 	return more[0] ~= 0;
 end
 
+-- Wipe the connection object before reusing it
+-- on another connection
 function S2NConnection.wipe(self)
 	local err = s2n_api.s2n_connection_wipe(self.Handle);
 	if err < 0 then
@@ -131,11 +136,41 @@ function S2NConnection.wipe(self)
 	return true;
 end
 
---[[
-extern int s2n_connection_set_fd(struct s2n_connection *conn, int readfd);
-extern int s2n_connection_set_read_fd(struct s2n_connection *conn, int readfd);
-extern int s2n_connection_set_write_fd(struct s2n_connection *conn, int readfd);
+-- Set the file descriptor for both reading and writing
+function S2NConnection.fileDescriptor(self, fd)
+	local err = s2n_api.s2n_connection_set_fd(self.Handle, fd);
 
+	if err < 0 then
+		return false, s2n_api.s2n_strerror();
+	end
+
+	return true;
+end
+
+-- Set the file descriptor that will be written to
+function S2NConnection.writingDescriptor(self, fd)
+	local err = s2n_api.s2n_connection_set_write_fd(self.Handle, fd);
+
+	if err < 0 then
+		return false, s2n_api.s2n_strerror();
+	end
+
+	return true;
+end
+
+-- Set the file descriptor that will be read from
+function S2NConnection.readingDescriptor(self, fd)
+	local err = s2n_api.s2n_connection_set_read_fd(self.Handle, fd);
+
+	if err < 0 then
+		return false, s2n_api.s2n_strerror();
+	end
+
+	return true;
+end
+
+
+--[[
 extern const uint8_t *s2n_connection_get_ocsp_response(struct s2n_connection *conn, uint32_t *length);
 
 extern uint64_t s2n_connection_get_wire_bytes_in(struct s2n_connection *conn);
