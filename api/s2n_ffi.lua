@@ -12,7 +12,8 @@ local S2N_TLS12 = 33;
 --extern __thread int s2n_errno;
 
 ffi.cdef[[
-typedef uint64_t ssize_t;
+typedef intptr_t ssize_t;
+
 struct s2n_config;
 
 extern int s2n_init();
