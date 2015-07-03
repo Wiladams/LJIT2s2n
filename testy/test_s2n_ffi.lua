@@ -4,12 +4,12 @@
 
 	What it will show is that the ffi can be included without
 	error.
-	
+
 --]]
 
 package.path = "../?.lua;"..package.path
 
-local s2n_ffi = require("s2n_ffi")
+local s2n_ffi = require("api.s2n_ffi")
 s2n_ffi();
 
 local conn = s2n_connection_new(S2N_SERVER);
