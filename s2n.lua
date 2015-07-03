@@ -131,7 +131,22 @@ function S2NConnection.wipe(self)
 	return true;
 end
 
+--[[
+extern int s2n_connection_set_fd(struct s2n_connection *conn, int readfd);
+extern int s2n_connection_set_read_fd(struct s2n_connection *conn, int readfd);
+extern int s2n_connection_set_write_fd(struct s2n_connection *conn, int readfd);
 
+extern const uint8_t *s2n_connection_get_ocsp_response(struct s2n_connection *conn, uint32_t *length);
+
+extern uint64_t s2n_connection_get_wire_bytes_in(struct s2n_connection *conn);
+extern uint64_t s2n_connection_get_wire_bytes_out(struct s2n_connection *conn);
+extern int s2n_connection_get_client_protocol_version(struct s2n_connection *conn);
+extern int s2n_connection_get_server_protocol_version(struct s2n_connection *conn);
+extern int s2n_connection_get_actual_protocol_version(struct s2n_connection *conn);
+extern int s2n_connection_get_client_hello_version(struct s2n_connection *conn);
+extern const char *s2n_connection_get_cipher(struct s2n_connection *conn);
+extern int s2n_connection_get_alert(struct s2n_connection *conn);
+--]]
 
 local exports = {
 	S2NConnection = S2NConnection;
