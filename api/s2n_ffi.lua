@@ -9,11 +9,11 @@ local S2N_TLS10 = 31;
 local S2N_TLS11 = 32;
 local S2N_TLS12 = 33;
 
---extern __thread int s2n_errno;
 
 ffi.cdef[[
 typedef intptr_t ssize_t;
 
+extern int s2n_errno;
 struct s2n_config;
 
 extern int s2n_init();
@@ -86,6 +86,8 @@ extern int s2n_connection_get_alert(struct s2n_connection *conn);
 ]]
 
 local function strerror(errcode)
+	errcode = errcode or s2n_errno;
+
 	local errstr = Lib_s2n.s2n_strerror(errcode, "EN");
 	if errstr == nil then
 		return "UNKNOWN ERROR";
@@ -108,6 +110,9 @@ local exports = {
 	-- s2n_mode
 	S2N_SERVER = ffi.C.S2N_SERVER;
 	S2N_CLIENT = ffi.C.S2N_CLIENT;
+	-- s2n_blinding
+	S2N_BUILT_IN_BLINDING = ffi.C.S2N_BUILT_IN_BLINDING;
+	S2N_SELF_SERVICE_BLINDING = ffi.C.S2N_SELF_SERVICE_BLINDING;
 
 	-- library functions
 	s2n_init = Lib_s2n.s2n_init;
