@@ -71,13 +71,16 @@ end
 -- negotiate the handshake/connection
 function S2NConnection.negotiate(self)
 	local more = ffi.new("int[1]");
-	local err = s2n_api.s2n_negotiate(self.Handle, more);
 
-	if err < 0 then
-		return false, s2n_api.s2n_strerror();
-	end
+	repeat
+		local err = s2n_api.s2n_negotiate(self.Handle, more);
 
-	return more[0] ~= 0;
+		if err < 0 then
+			return false, s2n_api.s2n_strerror();
+		end
+	until more[0] == 0;
+
+	return true;
 end
 
 -- get or set the server name
@@ -116,13 +119,16 @@ end
 -- shutdown the connection object
 function S2NConnection.shutdown(self)
 	local more = ffi.new("int[1]")
-	local err = s2n_api.s2n_shutdown(self.Handle, more);
+	
+	repeat
+		local err = s2n_api.s2n_shutdown(self.Handle, more);
 
-	if err < 0 then
-		return false, s2n_api.s2n_strerror();
-	end
+		if err < 0 then
+			return false, s2n_api.s2n_strerror();
+		end
+	until more[0] == 0
 
-	return more[0] ~= 0;
+	return true;
 end
 
 -- Wipe the connection object before reusing it
@@ -169,12 +175,19 @@ function S2NConnection.readingDescriptor(self, fd)
 	return true;
 end
 
+-- total number of bytes on the wire coming in
+function S2NConnection.wireBytesIn(self)
+	return tonumber(s2n_api.s2n_connection_get_wire_bytes_in(self.Handle));
+end
+
+-- total number of bytes on the wire going out
+function S2NConnection.wireBytesOut(self)	
+	return tonumber(s2n_api.s2n_connection_get_wire_bytes_out(self.Handle));
+end
 
 --[[
 extern const uint8_t *s2n_connection_get_ocsp_response(struct s2n_connection *conn, uint32_t *length);
 
-extern uint64_t s2n_connection_get_wire_bytes_in(struct s2n_connection *conn);
-extern uint64_t s2n_connection_get_wire_bytes_out(struct s2n_connection *conn);
 extern int s2n_connection_get_client_protocol_version(struct s2n_connection *conn);
 extern int s2n_connection_get_server_protocol_version(struct s2n_connection *conn);
 extern int s2n_connection_get_actual_protocol_version(struct s2n_connection *conn);
