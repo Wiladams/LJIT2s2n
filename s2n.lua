@@ -103,15 +103,34 @@ function S2NConnection.serverName(self, value)
 end
 
 function S2NConnection.receive(self, buff, size)
+	local buffPtr = ffi.cast("uint8_t *", buff)
+
 	local more = ffi.new("int[1]")
-	local received = s2n_api.s2n_recv(self.Handle,  buff, size, more);
+	local bytes_read = 0;
+
+	repeat
+		local received = s2n_api.s2n_recv(self.Handle,  buffPtr+bytes_read, size-bytes_read, more);
+		if received < 0 then
+			return false, s2n_api.s2n_strerror();
+		end
+		bytes_read = bytes_read + received;
+	until more[0] == 0 or bytes_read >= size
 
 	return true;
 end
 
 function S2NConnection.send(self, buff, size)
+	local buffPtr = ffi.cast("uint8_t *", buff)
 	local more = ffi.new("int[1]")
-	local sent = s2n_api.s2n_send(self.Handle, buff, size, more);
+	local bytes_sent = 0;
+
+	repeat
+		local sent = s2n_api.s2n_send(self.Handle, buffPtr+bytes_sent, size-bytes_sent, more);
+		if sent < 0 then
+			return false, s2n_api.s2n_strerror();
+		end
+		bytes_sent = bytes_sent + sent;			
+	until more[0] == 0 or bytes_sent >= size
 
 	return true;
 end
