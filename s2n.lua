@@ -1,6 +1,10 @@
 local ffi = require("ffi")
 local s2n_api = require("api.s2n_ffi")
 
+
+--[[
+	connection object
+--]]
 local S2NConnection = {}
 setmetatable(S2NConnection, {
 	__call = function(self, ...)
@@ -74,7 +78,6 @@ function S2NConnection.negotiate(self)
 
 	repeat
 		local err = s2n_api.s2n_negotiate(self.Handle, more);
-
 		if err < 0 then
 			return false, s2n_api.s2n_strerror();
 		end
@@ -204,13 +207,45 @@ function S2NConnection.wireBytesOut(self)
 	return tonumber(s2n_api.s2n_connection_get_wire_bytes_out(self.Handle));
 end
 
+function S2NConnection.clientHelloVersion(self)
+	local ver = s2n_api.s2n_connection_get_client_hello_version(self.Handle);
+	if ver < 0 then
+		return false, s2n_api.s2n_strerror();
+	end
+
+	return ver;
+end
+
+function S2NConnection.clientProtocolVersion(self)
+	local ver = s2n_api.s2n_connection_get_client_protocol_version(self.Handle);
+	if ver < 0 then
+		return false, s2n_api.s2n_strerror();
+	end
+
+	return ver;
+end
+
+function S2NConnection.serverProtocolVersion(self)
+	local ver = s2n_api.s2n_connection_get_server_protocol_version(self.Handle);
+	if ver < 0 then
+		return false, s2n_api.s2n_strerror();
+	end
+
+	return ver;
+end
+
+function S2NConnection.actualProtocolVersion(self)
+	local ver = s2n_api.s2n_connection_get_actual_protocol_version(self.Handle);
+	if ver < 0 then
+		return false, s2n_api.s2n_strerror();
+	end
+
+	return ver;
+end
+
 --[[
 extern const uint8_t *s2n_connection_get_ocsp_response(struct s2n_connection *conn, uint32_t *length);
 
-extern int s2n_connection_get_client_protocol_version(struct s2n_connection *conn);
-extern int s2n_connection_get_server_protocol_version(struct s2n_connection *conn);
-extern int s2n_connection_get_actual_protocol_version(struct s2n_connection *conn);
-extern int s2n_connection_get_client_hello_version(struct s2n_connection *conn);
 extern const char *s2n_connection_get_cipher(struct s2n_connection *conn);
 extern int s2n_connection_get_alert(struct s2n_connection *conn);
 --]]

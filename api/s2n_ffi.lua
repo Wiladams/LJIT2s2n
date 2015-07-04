@@ -1,3 +1,4 @@
+
 local ffi = require("ffi")
 
 local Lib_ssl = ffi.load("ssl", true)
@@ -86,7 +87,7 @@ extern int s2n_connection_get_alert(struct s2n_connection *conn);
 ]]
 
 local function strerror(errcode)
-	errcode = errcode or s2n_errno;
+	errcode = errcode or Lib_s2n.s2n_errno;
 
 	local errstr = Lib_s2n.s2n_strerror(errcode, "EN");
 	if errstr == nil then
