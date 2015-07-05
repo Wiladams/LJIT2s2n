@@ -1,15 +1,19 @@
 A LuaJIT binding to the s2n TLS library
 
 
-The only file that is actually needed is: api/s2n_ffi.lua
+If you want to use the binding as if you were programming in 
+C, then, the only file that is actually needed is: api/s2n_ffi.lua
 
-This contains what is considered to be the "API" of this library.
+This will give you the raw API functions of the s2n library.
 
-All other files are core components, and should not be referred to 
-directly from within your programs.  They are built up here to see
-how much of them can be improved via Lua implementation, for example, 
-turning error codes into string values could be a simple lua table
-lookup.
+If you want more of a Lua feel, then you'll want to use the 
+s2n.lua file, wich will over time contain various 'class' constructs
+which are more convenient to use.
 
-The testy/ directory will contain some sample code of how to use
-various parts of the library.
+This binding is a work in progress, and only the core API is effective
+at the moment.  
+
+The S2NConnection object is fairly complex, but will be more complete
+once the Configuration object is finished as well.
+
+
