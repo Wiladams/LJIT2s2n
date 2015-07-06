@@ -1,6 +1,6 @@
 local ffi = require("ffi")
 
-require ("utils.s2n_blob")
+local s2n_blob = require ("utils.s2n_blob")
 
 ffi.cdef[[
 struct s2n_stuffer {
@@ -86,15 +86,7 @@ extern int s2n_stuffer_read_base64(struct s2n_stuffer *stuffer, struct s2n_stuff
 extern int s2n_stuffer_write_base64(struct s2n_stuffer *stuffer, struct s2n_stuffer *in);
 ]]
 
---[[
-/* Useful for text manipulation ... */
-#define s2n_stuffer_init_text( stuffer, text, len, err )  s2n_stuffer_init( (stuffer), (uint8_t *) (text), (len), (err) )
-#define s2n_stuffer_write_char( stuffer, c, err )  s2n_stuffer_write_uint8( (stuffer), (uint8_t) (c), (err) )
-#define s2n_stuffer_read_char( stuffer, c, err )  s2n_stuffer_read_uint8( (stuffer), (uint8_t *) (c), (err) )
-#define s2n_stuffer_write_str( stuffer, c, n, err )  s2n_stuffer_write( (stuffer), (const uint8_t *) (c), strlen((c)), (err) )
-#define s2n_stuffer_write_text( stuffer, c, n, err )  s2n_stuffer_write( (stuffer), (const uint8_t *) (c), (n), (err) )
-#define s2n_stuffer_read_text( stuffer, c, n, err )  s2n_stuffer_read( (stuffer), (uint8_t *) (c), (n), (err) )
---]]
+
 
 ffi.cdef[[
 extern int s2n_stuffer_peek_char(struct s2n_stuffer *stuffer, char *c);
@@ -112,6 +104,65 @@ extern int s2n_stuffer_certificate_from_pem(struct s2n_stuffer *pem, struct s2n_
 extern int s2n_stuffer_dhparams_from_pem(struct s2n_stuffer *pem, struct s2n_stuffer *pkcs3);
 ]]
 
-local exports = {}
+
+-- Useful for text manipulation ... 
+local Lib_s2n = ffi.load("s2n")
+
+local function s2n_stuffer_init_text( stuffer, text, len)  
+    return Lib_s2n.s2n_stuffer_init(stuffer, ffi.cast("uint8_t *", text), len)
+end
+
+local function s2n_stuffer_write_char( stuffer, c)  
+    return Lib_s2n.s2n_stuffer_write_uint8(stuffer, ffi.cast("uint8_t", c))
+end
+
+local function s2n_stuffer_read_char( stuffer, c)  
+    return Lib_s2n.s2n_stuffer_read_uint8(stuffer, ffi.cast("uint8_t *", c))
+end
+
+local function s2n_stuffer_write_str( stuffer, c)  
+    local blob = s2n_blob.s2n_blob(ffi.cast("uint8_t *",c), #c)
+    return Lib_s2n.s2n_stuffer_write(stuffer, blob)
+end
+
+local function s2n_stuffer_write_text( stuffer, c, n)  
+    return Lib_s2n.s2n_stuffer_write(stuffer, ffi.cast("const uint8_t *", c), n)
+end
+
+local function s2n_stuffer_read_text( stuffer, c, n)  
+    return Lib_s2n.s2n_stuffer_read(stuffer, ffi.cast("uint8_t *", c), n)
+end
+
+local exports = {
+    s2n_stuffer = ffi.typeof("struct s2n_stuffer");
+
+    -- local functions
+    s2n_stuffer_init_text = s2n_stuffer_init_text;
+    s2n_stuffer_write_char = s2n_stuffer_write_char;
+    s2n_stuffer_read_char = s2n_stuffer_read_char;
+    s2n_stuffer_write_str = s2n_stuffer_write_str;
+    s2n_stuffer_write_text = s2n_stuffer_write_text;
+    s2n_stuffer_read_text = s2n_stuffer_read_text;
+
+    -- library functions
+    s2n_stuffer_init = Lib_s2n.s2n_stuffer_init;
+    s2n_stuffer_alloc = Lib_s2n.s2n_stuffer_alloc;
+    s2n_stuffer_growable_alloc = Lib_s2n.s2n_stuffer_growable_alloc;
+    s2n_stuffer_free = Lib_s2n.s2n_stuffer_free;
+    s2n_stuffer_resize = Lib_s2n.s2n_stuffer_resize;
+    s2n_stuffer_reread = Lib_s2n.s2n_stuffer_reread;
+    s2n_stuffer_rewrite = Lib_s2n.s2n_stuffer_rewrite;
+    s2n_stuffer_wipe = Lib_s2n.s2n_stuffer_wipe;
+    s2n_stuffer_wipe_n = Lib_s2n.s2n_stuffer_wipe_n;
+
+    -- basic read/write
+    s2n_stuffer_read = Lib_s2n.s2n_stuffer_read;
+    s2n_stuffer_erase_and_read = Lib_s2n.s2n_stuffer_erase_and_read;
+    s2n_stuffer_write = Lib_s2n.s2n_stuffer_write;
+    s2n_stuffer_read_bytes = Lib_s2n.s2n_stuffer_read_bytes;
+    s2n_stuffer_write_bytes = Lib_s2n.s2n_stuffer_write_bytes;
+    s2n_stuffer_skip_read = Lib_s2n.s2n_stuffer_skip_read;
+    s2n_stuffer_skip_write = Lib_s2n.s2n_stuffer_skip_write;
+}
 
 return exports
