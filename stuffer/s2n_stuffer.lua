@@ -137,6 +137,9 @@ local exports = {
     s2n_stuffer = ffi.typeof("struct s2n_stuffer");
 
     -- local functions
+    s2n_stuffer_data_available = s2n_stuffer_data_available;
+    s2n_stuffer_space_remaining = s2n_stuffer_space_remaining;
+
     s2n_stuffer_init_text = s2n_stuffer_init_text;
     s2n_stuffer_write_char = s2n_stuffer_write_char;
     s2n_stuffer_read_char = s2n_stuffer_read_char;
@@ -163,6 +166,32 @@ local exports = {
     s2n_stuffer_write_bytes = Lib_s2n.s2n_stuffer_write_bytes;
     s2n_stuffer_skip_read = Lib_s2n.s2n_stuffer_skip_read;
     s2n_stuffer_skip_write = Lib_s2n.s2n_stuffer_skip_write;
+
+    s2n_stuffer_raw_write = Lib_s2n.s2n_stuffer_raw_write;
+    s2n_stuffer_raw_read = Lib_s2n.s2n_stuffer_raw_read;
+
+    s2n_stuffer_recv_from_fd = Lib_s2n.s2n_stuffer_recv_from_fd;
+    s2n_stuffer_send_to_fd = Lib_s2n.s2n_stuffer_send_to_fd;
+
+    -- read/write integers in network byte order
+    s2n_stuffer_read_uint8 = Lib_s2n.s2n_stuffer_read_uint8;
+    s2n_stuffer_read_uint16 = Lib_s2n.s2n_stuffer_read_uint16;
+    s2n_stuffer_read_uint24 = Lib_s2n.s2n_stuffer_read_uint24;
+    s2n_stuffer_read_uint32 = Lib_s2n.s2n_stuffer_read_uint32;
+    --s2n_stuffer_read_uint64 = Lib_s2n.s2n_stuffer_read_uint64;
+
+    s2n_stuffer_write_uint8 = Lib_s2n.s2n_stuffer_write_uint8;
+    s2n_stuffer_write_uint16 = Lib_s2n.s2n_stuffer_write_uint16;
+    s2n_stuffer_write_uint24 = Lib_s2n.s2n_stuffer_write_uint24;
+    s2n_stuffer_write_uint32 = Lib_s2n.s2n_stuffer_write_uint32;
+    --s2n_stuffer_write_uint64 = Lib_s2n.s2n_stuffer_write_uint64;
+
+    -- copy one stuffer to another
+    s2n_stuffer_copy = Lib_s2n.s2n_stuffer_copy;
+
+    -- base64 read/write
+    s2n_stuffer_read_base64 = Lib_s2n.s2n_stuffer_read_base64;
+    s2n_stuffer_write_base64 = Lib_s2n.s2n_stuffer_write_base64;
 }
 
 return exports
