@@ -35,9 +35,11 @@ end
 -- char * cert_chain_pem
 -- char * private_key_pem
 function S2Config.addCertChainAndKey(self, cert_chain_pem, private_key_pem)
+	-- need to hold onto these so they're not 
+	-- garbage collected too early?
 	self.cert_chain_pem = cert_chain_pem;
 	self.private_key_pem = private_key_pem;
-	
+
 	local err = s2n_api.s2n_config_add_cert_chain_and_key(self.Handle, 
 		cert_chain_pem, private_key_pem);
 
